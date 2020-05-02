@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">MyWeather</string>
+    <string name="country_name">Страна</string>
+    <string name="city_name">Город</string>
+    <string name="button_Search">Смотреть погоду</string>
+    <string name="buttonBack_Search">Вернутся</string>
+    <string name="Pressure">Давление:</string>
+    <string name="Humidity">Влажность:</string>
+    <string name="Wind">Ветер:</string>
+    <string name="SunR">Восход:</string>
+    <string name="SunS">Закат:</string>
+    <string name="Country">Страна:</string>
+    <string name="City">Город:</string>
+</resources>

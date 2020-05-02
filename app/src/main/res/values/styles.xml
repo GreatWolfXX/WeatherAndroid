@@ -1,0 +1,15 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.MaterialComponents.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+    </style>
+
+    <style name="TextStyle">
+        <item name="android:fontFamily">@font/comic_sans_ms</item>
+        <item name="fontFamily">@font/comic_sans_ms</item>
+        <item name="android:textStyle">normal</item>
+    </style>
+
+</resources>
