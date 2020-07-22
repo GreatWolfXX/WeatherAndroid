@@ -46,7 +46,7 @@ public class WeatherActivity extends Activity {
 
     //------------URL------------
     String place;
-    String appId = "81ef8c608332d394a9b8d337fc128545";
+    String appId = "OpenWeatherMap Token";
     String units = "metric";
 
     //------------Int------------
