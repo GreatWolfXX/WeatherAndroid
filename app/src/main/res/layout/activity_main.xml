@@ -38,6 +38,21 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.95" />
 
+    <View
+        android:id="@+id/view3"
+        android:layout_width="0dp"
+        android:layout_height="116dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="10dp"
+        android:background="@drawable/view_roundet"
+        android:elevation="4dp"
+        app:layout_constraintBottom_toTopOf="@+id/view2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/view"
+        app:layout_constraintVertical_bias="0.100000024" />
+
     <com.google.android.material.textfield.TextInputLayout
         style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.ExposedDropdownMenu"
         android:id="@+id/textInputLayout"
@@ -82,37 +97,9 @@
             android:textColor="@color/colorTextSecondary"/>
     </com.google.android.material.textfield.TextInputLayout>
 
-    <ListView
-        android:id="@+id/listCountry"
-        android:layout_width="320dp"
-        android:layout_height="180dp"
-        android:background="@color/colorPrimerySecondary"
-        android:translationZ="7dp"
-        android:visibility="invisible"
-        app:layout_constraintBottom_toTopOf="@+id/view2"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textInputLayout"
-        app:layout_constraintVertical_bias="0.0">
-
-    </ListView>
-
-    <ListView
-        android:id="@+id/listCity"
-        android:layout_width="320dp"
-        android:layout_height="180dp"
-        android:background="@color/colorPrimerySecondary"
-        android:translationZ="7dp"
-        android:visibility="invisible"
-        app:layout_constraintBottom_toTopOf="@+id/view2"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/password_text_input"
-        app:layout_constraintVertical_bias="0.0" />
-
     <com.google.android.material.button.MaterialButton
-        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
         android:id="@+id/buttonWeather"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
         android:layout_width="320dp"
         android:layout_height="98dp"
         android:text="@string/button_Search"
@@ -124,5 +111,20 @@
         app:layout_constraintEnd_toEndOf="@+id/view2"
         app:layout_constraintStart_toStartOf="@+id/view2"
         app:layout_constraintTop_toTopOf="@+id/view2" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/buttonAutoPlace"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        android:layout_width="320dp"
+        android:layout_height="88dp"
+        android:backgroundTint="@color/colorPrimeryButton"
+        android:text="@string/button_AutoSearchPlace"
+        android:textColor="@color/colorTextSecondary"
+        android:textSize="18sp"
+        android:translationZ="7dp"
+        app:layout_constraintBottom_toBottomOf="@+id/view3"
+        app:layout_constraintEnd_toEndOf="@+id/view3"
+        app:layout_constraintStart_toStartOf="@+id/view3"
+        app:layout_constraintTop_toTopOf="@+id/view3" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

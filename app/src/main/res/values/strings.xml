@@ -3,6 +3,7 @@
     <string name="country_name">Страна</string>
     <string name="city_name">Город</string>
     <string name="button_Search">Смотреть погоду</string>
+    <string name="button_AutoSearchPlace">Определить местоположение</string>
     <string name="buttonBack_Search">Вернутся</string>
     <string name="Pressure">Давление:</string>
     <string name="Humidity">Влажность:</string>
