@@ -1,15 +1,25 @@
 package com.example.myweather;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
 import android.os.Bundle;
 
-import android.util.Log;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+
+import com.example.myweather.Weather.WeatherActivity;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnSuccessListener;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -19,14 +29,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-
-import retrofit2.Callback;
-import retrofit2.Call;
-import retrofit2.Response;
+import java.util.List;
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
     //------------Button------------
     Button buttonWeather;
+    Button buttonAutoPlace;
 
     //------------JSON_Value------------
     JSONObject city_object;
@@ -49,6 +58,9 @@ public class MainActivity extends AppCompatActivity {
     String tempCountry;
     String tempCity;
 
+    //------------Location_Varible------------
+    private FusedLocationProviderClient fusedLocationClient;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
 
         //------------Button_Load------------
         buttonWeather = findViewById(R.id.buttonWeather);
+        buttonAutoPlace = findViewById(R.id.buttonAutoPlace);
 
         //------------loadList------------
         country_list = new ArrayList<>();
@@ -81,6 +94,13 @@ public class MainActivity extends AppCompatActivity {
 
             //------------StartActivity------------
             startActivity(intent);
+        });
+
+        buttonAutoPlace.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                autoSearchPlace();
+            }
         });
 
         //------------GetJSONValues------------
@@ -147,5 +167,36 @@ public class MainActivity extends AppCompatActivity {
 
         String json = new String(buffer, StandardCharsets.UTF_8);
         return json;
+    }
+
+    //------------AutoSearchPlace------------
+    public void autoSearchPlace(){
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(MainActivity.this);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            fusedLocationClient.getLastLocation()
+                    .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                        @Override
+                        public void onSuccess(Location location) {
+                            if (location != null) {
+                                Geocoder geoCoder = new Geocoder(MainActivity.this, Locale.getDefault());
+                                try {
+                                    List<Address> address = geoCoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
+
+                                    Intent intent = new Intent(MainActivity.this, WeatherActivity.class);
+
+                                    intent.putExtra("COUNTRY",address.get(0).getCountryName());
+                                    intent.putExtra("CITY", address.get(0).getLocality());
+
+                                    startActivity(intent);
+                                } catch (IOException | NullPointerException e) {
+
+                                }
+                            }
+                        }
+                    });
+        }else{
+            ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.ACCESS_FINE_LOCATION},0);
+            autoSearchPlace();
+        }
     }
 }
