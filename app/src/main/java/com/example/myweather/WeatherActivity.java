@@ -7,17 +7,19 @@ import android.util.Log;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 
-import androidx.annotation.NonNull;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 
 public class WeatherActivity extends Activity {
@@ -41,11 +43,6 @@ public class WeatherActivity extends Activity {
     //------------String------------
     String tempCountry;
     String tempCity;
-
-    //------------URL------------
-    String place;
-    String appId = "81ef8c608332d394a9b8d337fc128545";
-    String units = "metric";
 
     //------------Int------------
     int timeZone;
@@ -83,7 +80,7 @@ public class WeatherActivity extends Activity {
         find_weather();
     }
 
-    public  void find_weather(){
+    public void find_weather(){
         //------------Bundle_Load------------
         Bundle info = getIntent().getExtras();
 
@@ -95,74 +92,90 @@ public class WeatherActivity extends Activity {
         textCountry.setText(tempCountry);
         textCity.setText(tempCity);
 
-        //------------Place_Load------------
-        place = tempCity + "," + tempCountry;
+        //------------URL_Weather------------
+        String url =  "http://api.openweathermap.org/data/2.5/weather?q="+ tempCity + "," + tempCountry + "&units=metric&appid=81ef8c608332d394a9b8d337fc128545&lang=ru";
 
-        NetworkService.getInstance()
-                .getJSONApi()
-                .getCurrentWeatherData(place, units, appId)
-                .enqueue(new Callback<WeatherResponse>() {
-                    @Override
-                    public void onResponse(@NonNull Call<WeatherResponse> call, @NonNull Response<WeatherResponse> response) {
-                        WeatherResponse weatherResponse = response.body();
+        //------------Json_Request------------
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null, response -> {
+            try {
 
-                        try {
-                            //------------InfoJson_SetText------------
-                            textPressure.setText((int) (weatherResponse.main.pressure * 0.75006375541921) + " hPa");
-                            textTemperature.setText(String.valueOf((int) weatherResponse.main.temp) + " ℃");
-                            textHumidity.setText(String.valueOf(((int) weatherResponse.main.humidity)) + " %");
-                            textWind.setText(String.valueOf((int) weatherResponse.wind.speed) + " м/с");
+                //------------JsonObject_Load------------
+                JSONObject main_object = response.getJSONObject("main");
+                JSONObject wind_object = response.getJSONObject("wind");
+                JSONObject sys_object = response.getJSONObject("sys");
 
-                            timeZone = weatherResponse.timezone;
+                JSONArray weather_array = response.getJSONArray("weather");
+                JSONObject weather_id = weather_array.getJSONObject(0);
 
-                            textSunRise.setText(date(weatherResponse.sys.sunrise));
-                            textSunSet.setText(date(weatherResponse.sys.sunset));
+                //------------StringInfoJson_Load------------
+                String temp = String.valueOf(main_object.getDouble("temp"));
+                String press = String.valueOf(main_object.getDouble("pressure"));
+                String humi = String.valueOf(main_object.getDouble("humidity"));
+                String windS = String.valueOf(wind_object.getDouble("speed"));
 
-                        //------------SwitchIMG------------
-                        switch(weatherResponse.weather.get(0).id){
-                            case 800:
-                                imageWeather.setImageDrawable(getResources().getDrawable(R.drawable.android_01d));
-                                break;
-                            case 801:
-                                imageWeather.setImageDrawable(getResources().getDrawable(R.drawable.android_02d));
-                                break;
-                            case 802:
-                                imageWeather.setImageDrawable(getResources().getDrawable(R.drawable.android_03d));
-                                break;
-                            case 803: case 804:
-                                imageWeather.setImageDrawable(getResources().getDrawable(R.drawable.android_04d));
-                                break;
-                            case 300: case 301: case 302: case 310: case 311: case 312: case 313: case 314: case 321: case 520: case 521: case 522: case 531:
-                                imageWeather.setImageDrawable(getResources().getDrawable(R.drawable.android_09d));
-                                break;
-                            case 500: case 501: case 502: case 503: case 504:
-                                imageWeather.setImageDrawable(getResources().getDrawable(R.drawable.android_10d));
-                                break;
-                            case 200: case 201: case 202: case 210: case 211: case 212: case 221: case 230: case 231: case 232:
-                                imageWeather.setImageDrawable(getResources().getDrawable(R.drawable.android_11d));
-                                break;
-                            case 511: case 600: case 601: case 602: case 611: case 612: case 613: case 615: case 616: case 620: case 621: case 622:
-                                imageWeather.setImageDrawable(getResources().getDrawable(R.drawable.android_13d));
-                                break;
-                            case 701: case 711: case 721: case 731: case 741: case 751: case 761: case 762: case 771: case 781:
-                                imageWeather.setImageDrawable(getResources().getDrawable(R.drawable.android_50d));
-                                break;
-                        }
-                        }catch (NullPointerException e){
-                            startActivity(new Intent(WeatherActivity.this, MainActivity.class));
-                            Toast toast = Toast.makeText(getApplicationContext(), "Этого места нет в базе данных погоды!", Toast.LENGTH_SHORT);
-                            toast.show();
-                        }
+                //------------IntTimeZone_Load------------
+                timeZone = Integer.valueOf(response.get("timezone") + "");
 
-                    }
+                //------------Int(Double,Long)Info_Load------------
+                long sunri = sys_object.getLong("sunrise");
+                long sunse = sys_object.getLong("sunset");
+                int idWeather = weather_id.getInt("id");
 
-                    @Override
-                    public void onFailure(@NonNull Call<WeatherResponse> call, @NonNull Throwable t) {
+                double cels = Double.parseDouble(temp);
 
-                        Log.d("Error", "Error");
-                        t.printStackTrace();
-                    }
-                });
+                double pres = Double.parseDouble(press);
+                double normPress = pres * 0.75006375541921;
+
+                double humid = Double.parseDouble(humi);
+
+                double windy = Double.parseDouble(windS);
+
+                //------------InfoJson_SetText------------
+                textPressure.setText(String.valueOf((int)normPress) + " hPa");
+                textTemperature.setText(String.valueOf((int)cels) + " ℃");
+                textHumidity.setText(String.valueOf(((int)humid)) + " %");
+                textWind.setText(String.valueOf((int)windy) + " м/с");
+                textSunRise.setText(date(sunri));
+                textSunSet.setText(date(sunse));
+
+                //------------SwitchIMG------------
+                switch(idWeather){
+                    case 800:
+                        imageWeather.setImageDrawable(getResources().getDrawable(R.drawable.android_01d));
+                        break;
+                    case 801:
+                        imageWeather.setImageDrawable(getResources().getDrawable(R.drawable.android_02d));
+                        break;
+                    case 802:
+                        imageWeather.setImageDrawable(getResources().getDrawable(R.drawable.android_03d));
+                        break;
+                    case 803: case 804:
+                        imageWeather.setImageDrawable(getResources().getDrawable(R.drawable.android_04d));
+                        break;
+                    case 300: case 301: case 302: case 310: case 311: case 312: case 313: case 314: case 321: case 520: case 521: case 522: case 531:
+                        imageWeather.setImageDrawable(getResources().getDrawable(R.drawable.android_09d));
+                        break;
+                    case 500: case 501: case 502: case 503: case 504:
+                        imageWeather.setImageDrawable(getResources().getDrawable(R.drawable.android_10d));
+                        break;
+                    case 200: case 201: case 202: case 210: case 211: case 212: case 221: case 230: case 231: case 232:
+                        imageWeather.setImageDrawable(getResources().getDrawable(R.drawable.android_11d));
+                        break;
+                    case 511: case 600: case 601: case 602: case 611: case 612: case 613: case 615: case 616: case 620: case 621: case 622:
+                        imageWeather.setImageDrawable(getResources().getDrawable(R.drawable.android_13d));
+                        break;
+                    case 701: case 711: case 721: case 731: case 741: case 751: case 761: case 762: case 771: case 781:
+                        imageWeather.setImageDrawable(getResources().getDrawable(R.drawable.android_50d));
+                        break;
+                }
+            } catch (JSONException  e) {
+                e.printStackTrace();
+            }
+        }, error -> {
+
+        });
+        RequestQueue queue = Volley.newRequestQueue(this);
+        queue.add(jsonObjectRequest);
     }
 
     //------------FunctionTimeZone------------
